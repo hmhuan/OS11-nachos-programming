@@ -1,0 +1,7 @@
+#include "syscall.h"
+
+void main(){
+	int res;
+	res = CreateFile("demoxyz.txt");
+	//printf("%d\n", res);
+}
