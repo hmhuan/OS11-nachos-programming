@@ -28,6 +28,8 @@
 #define SC_Read		6
 #define SC_Write	7
 #define SC_Close	8
+//Syscall cho cac thao tac co ban
+#define SC_PrintString		16
 
 #define SC_Fork		9
 #define SC_Yield	10
@@ -122,6 +124,11 @@ void Close(OpenFileId id);
  * as the current thread.
  */
 void Fork(void (*func)());
+
+/*
+* Print a string to console
+*/
+void PrintString(char* str);
 
 /* Yield the CPU to another runnable thread, whether in this address space 
  * or not. 

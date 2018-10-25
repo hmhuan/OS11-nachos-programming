@@ -116,6 +116,15 @@ Close:
 
 	.globl Fork
 	.ent	Fork
+	
+	.globl PrintString
+	.ent PrintString
+PrintString:
+	addiu $2, $0, SC_PrintString
+	syscall
+	j	$31
+	.end PrintString
+	
 Fork:
 	addiu $2,$0,SC_Fork
 	syscall

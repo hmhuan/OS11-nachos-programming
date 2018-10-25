@@ -182,6 +182,40 @@ void Open_handler(){
 		delete[] filename;
 }
 
+int Close_handler(){
+	// constant
+	int fileNum = 10;
+	//Input id cua file(OpenFileID)
+	// Output: 0: thanh cong, -1 that bai
+	int fid = machine->ReadRegister(4); // Lay id cua file tu thanh ghi so 4
+	if (fid >= 0 && fid < fileNum) //Chi xu li khi fid nam trong [0, 14]
+	{
+		if (fileSystem->openf[fid]) //neu mo file thanh cong
+		{
+			delete fileSystem->openf[fid]; //Xoa vung nho luu tru file
+			fileSystem->openf[fid] = NULL; //Gan vung nho NULL
+			machine->WriteRegister(2, 0);
+		}
+	}
+	machine->WriteRegister(2, -1);
+}
+
+void PrintString_handler(){
+	// Input: Buffer(char*)
+	// Output: Chuoi doc duoc tu buffer(char*)
+	// Cong dung: Xuat mot chuoi la tham so buffer truyen vao ra man hinh
+	int virtAddr;
+	char* buffer;
+	virtAddr = machine->ReadRegister(4); // Lay dia chi cua tham so buffer tu thanh ghi so 4
+	buffer = User2System(virtAddr, 255); // Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai 255 ki tu
+	int length = 0;
+	while (buffer[length] != 0) length++; // Dem do dai that cua chuoi
+	gSynchConsole->Write(buffer, length + 1); // Goi ham Write cua SynchConsole de in chuoi
+	delete buffer; 
+	//IncreasePC(); // Tang Program Counter 
+	//return;
+}
+
 void ExceptionHandler(ExceptionType which)
 {
     int type = machine->ReadRegister(2);
@@ -248,8 +282,17 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		case SC_Open:
 			Open_handler();
-			printf("\n SC_OPEN successful");
+			//printf("\n SC_OPEN successful");
+			//interrupt->Halt();
+			break;
+		case SC_Close:
+			Close_handler();
+			printf("\n SC_CLOSE successful");
 			interrupt->Halt();
+			break;
+		case SC_PrintString:
+			PrintString_handler();
+			//interrupt->Halt();
 			break;
 		default:
 			printf("\nUnexpected user mode exception (%d %d)", which, type);
