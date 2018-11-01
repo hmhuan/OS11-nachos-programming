@@ -83,3 +83,15 @@ printstring.o: printstring.c
 printstring: printstring.o start.o
 	$(LD) $(LDFLAGS) start.o printstring.o -o printstring.coff
 	../bin/coff2noff printstring.coff printstring
+	
+read.o: read.c
+	$(CC) $(CFLAGS) -c read.c
+read: read.o start.o
+	$(LD) $(LDFLAGS) start.o read.o -o read.coff
+	../bin/coff2noff read.coff read
+
+write.o: write.c
+	$(CC) $(CFLAGS) -c write.c
+write: write.o start.o
+	$(LD) $(LDFLAGS) start.o write.o -o write.coff
+	../bin/coff2noff write.coff write
