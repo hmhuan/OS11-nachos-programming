@@ -55,7 +55,11 @@ class OpenFile {
 		currentOffset += numWritten;
 		return numWritten;
 		}
-
+    int Seek(int pos) {
+		Lseek(file, pos, 0);
+		currentOffset = Tell(file);
+		return currentOffset;
+	}
     int Length() { 
 	int len;
 	Lseek(file, 0, 2); 
@@ -68,6 +72,7 @@ int GetCurrentPos() { currentOffset = Tell(file); return currentOffset; }
   private:
     int file;
     int currentOffset;
+	int seekPosition;
 };
 
 #else // FILESYS
@@ -88,6 +93,7 @@ class OpenFile {
 
     void Seek(int position); 		// Set the position from which to 
 					// start reading/writing -- UNIX lseek
+
 
     int Read(char *into, int numBytes); // Read/write bytes from the file,
 					// starting at the implicit position.

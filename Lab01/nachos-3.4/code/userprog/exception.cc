@@ -134,13 +134,11 @@ int virtAddr;
 				//Tao file that bai
 				printf("\n Error create file '%s'", filename);
 				machine->WriteRegister(2, -1);
-				//printf("successful!\n");
 				delete filename;
 				return;
 			}
 			//Tao file thanh cong
 			machine->WriteRegister(2, 0);
-			printf("\nsuccessful!");
 			delete filename;
 }
 
@@ -161,25 +159,23 @@ void Open_handler(){
 		if (type == 0 || type == 1) //chi xu li khi type = 0 hoac 1
 		{
 					
-			if ((/*fileSystem->openf[freeSlot] = */fileSystem->Open(filename, type)) != NULL) //Mo file thanh cong
+			if ((fileSystem->openf[freeSlot] = fileSystem->Open(filename, type)) != NULL) //Mo file thanh cong
 			{
 				machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
 			}
-		}
-		else if (type == 2) // xu li stdin voi type quy uoc la 2
-		{
-			machine->WriteRegister(2, 0); //tra ve OpenFileID
-		}
-		else // xu li stdout voi type quy uoc la 3
-		{
-			machine->WriteRegister(2, 1); //tra ve OpenFileID
+			else if (type == 0) {
+				fileSystem->Create(filename,0);
+				fileSystem->openf[freeSlot] = fileSystem->Open(filename, type); //Mo file thanh cong
+				
+				machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
+			}
 		}
 		delete[] filename;
 		return;
-		}
-		machine->WriteRegister(2, -1); //Khong mo duoc file return -1
+	}
+	machine->WriteRegister(2, -1); //Khong mo duoc file return -1
 
-		delete[] filename;
+	delete[] filename;
 }
 
 int Close_handler(){
@@ -194,6 +190,7 @@ int Close_handler(){
 		{
 			delete fileSystem->openf[fid]; //Xoa vung nho luu tru file
 			fileSystem->openf[fid] = NULL; //Gan vung nho NULL
+			increasePC();
 			machine->WriteRegister(2, 0);
 		}
 	}
@@ -212,8 +209,21 @@ void PrintString_handler(){
 	while (buffer[length] != 0) length++; // Dem do dai that cua chuoi
 	gSynchConsole->Write(buffer, length + 1); // Goi ham Write cua SynchConsole de in chuoi
 	delete buffer; 
-	//IncreasePC(); // Tang Program Counter 
-	//return;
+}
+
+void ReadString_handler()
+{
+	// Input: Buffer(char*), do dai toi da cua chuoi nhap vao(int)
+	// Output: Khong co
+	// Cong dung: Doc vao mot chuoi voi tham so la buffer va do dai toi da
+	int virtAddr, length;
+	char* buffer;
+	virtAddr = machine->ReadRegister(4); // Lay dia chi tham so buffer truyen vao tu thanh ghi so 4
+	length = machine->ReadRegister(5); // Lay do dai toi da cua chuoi nhap vao tu thanh ghi so 5
+	buffer = User2System(virtAddr, length); // Copy chuoi tu vung nho User Space sang System Space
+	gSynchConsole->Read(buffer, length); // Goi ham Read cua SynchConsole de doc chuoi
+	System2User(virtAddr, length, buffer); // Copy chuoi tu vung nho System Space sang vung nho User Space
+	delete buffer; 	
 }
 
 void Read_handler() {
@@ -230,16 +240,17 @@ void Read_handler() {
 	if (id < 0 || id > 10)
 	{
 		printf("\nKhong the doc vi id nam ngoai bang mo ta file.");
+		//increasePC();
 		machine->WriteRegister(2, -1);
-		//IncreasePC();
 		return;
 	}
 	// Kiem tra file co ton tai khong
 	if (fileSystem->openf[id] == NULL)
 	{
 		printf("\nKhong the read vi file nay khong ton tai.");
+		
 		machine->WriteRegister(2, -1);
-		//IncreasePC();
+		//increasePC();
 		return;
 	}
 	
@@ -251,9 +262,10 @@ void Read_handler() {
 		// Su dung ham Read cua lop SynchConsole de tra ve so byte thuc su doc duoc
 		int size = gSynchConsole->Read(buf, charcount); 
 		System2User(virtAddr, size, buf); // Copy chuoi tu vung nho System Space sang User Space voi bo dem buffer co do dai la so byte thuc su
+		//increasePC();
 		machine->WriteRegister(2, size); // Tra ve so byte thuc su doc duoc
 		delete buf;
-		//IncreasePC();
+		//increasePC();
 		return;
 	}
 	// Xet truong hop doc file binh thuong thi tra ve so byte thuc su
@@ -263,16 +275,17 @@ void Read_handler() {
 		NewPos = fileSystem->openf[id]->GetCurrentPos();
 		// Copy chuoi tu vung nho System Space sang User Space voi bo dem buffer co do dai la so byte thuc su 
 		System2User(virtAddr, NewPos - OldPos, buf); 
+		//increasePC();
 		machine->WriteRegister(2, NewPos - OldPos);
 	}
 	else
 	{
 		// Truong hop con lai la doc file co noi dung la NULL tra ve -2
 		//printf("\nDoc file rong.");
+		//increasePC();
 		machine->WriteRegister(2, -2);
 	}
 	delete buf;
-	//IncreasePC();
 }
 
 void Write_handler() {
@@ -340,6 +353,52 @@ void Write_handler() {
 				}
 			}	
 }
+void Seek_handler(){
+	// Input: Vi tri(int), id cua file(OpenFileID)
+	// Output: -1: Loi, Vi tri thuc su: Thanh cong
+	// Cong dung: Di chuyen con tro den vi tri thich hop trong file voi tham so la vi tri can chuyen va id cua file
+	int pos = machine->ReadRegister(4); // Lay vi tri can chuyen con tro den trong file
+	int id = machine->ReadRegister(5); // Lay id cua file
+	// Kiem tra id cua file truyen vao co nam ngoai bang mo ta file khong
+	if (id < 0 || id > 10)
+	{
+		printf("\nKhong the seek vi id nam ngoai bang mo ta file.");
+		machine->WriteRegister(2, -1);
+
+		return;
+	}
+	// Kiem tra file co ton tai khong
+	if (fileSystem->openf[id] == NULL)
+	{
+		printf("\nKhong the seek vi file nay khong ton tai.");
+		machine->WriteRegister(2, -1);
+
+		return;
+	}
+	// Kiem tra co goi Seek tren console khong
+	if (id == 0 || id == 1)
+	{
+		printf("\nKhong the seek tren file console.");
+		machine->WriteRegister(2, -1);
+
+		return;
+	}
+	// Neu pos = -1 thi gan pos = Length nguoc lai thi giu nguyen pos
+	pos = (pos == -1) ? fileSystem->openf[id]->Length() : pos;
+	if (pos > fileSystem->openf[id]->Length() || pos < 0) // Kiem tra lai vi tri pos co hop le khong
+	{
+		printf("\nKhong the seek file den vi tri nay.");
+		machine->WriteRegister(2, -1);
+	}
+	else
+	{
+		// Neu hop le thi tra ve vi tri di chuyen thuc su trong file
+		fileSystem->openf[id]->Seek(pos);
+		machine->WriteRegister(2, pos);
+	}
+	return;
+}
+
 
 void ExceptionHandler(ExceptionType which)
 {
@@ -384,6 +443,7 @@ void ExceptionHandler(ExceptionType which)
 		interrupt->Halt();
 		break;
 	case SyscallException:
+		increasePC();
 		switch (type)
 		{
 		case SC_Halt:
@@ -407,17 +467,16 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		case SC_Open:
 			Open_handler();
-			//printf("\n SC_OPEN successful");
-			//interrupt->Halt();
 			break;
 		case SC_Close:
 			Close_handler();
 			printf("\n SC_CLOSE successful");
-			interrupt->Halt();
 			break;
 		case SC_PrintString:
 			PrintString_handler();
-			//interrupt->Halt();
+			break;
+		case SC_ReadString:
+			ReadString_handler();
 			break;
 		case SC_Read:
 			Read_handler();
@@ -425,12 +484,15 @@ void ExceptionHandler(ExceptionType which)
 		case SC_Write:
 			Write_handler();
 			break;
+		case SC_Seek:
+			Seek_handler();
+			break;
 		default:
 			printf("\nUnexpected user mode exception (%d %d)", which, type);
 			ASSERT(FALSE);
 			break;
 		}
-		increasePC();
+		
 		break;
 	default:
 		printf("\nUnexpected user mode exception (%d %d)", which, type);

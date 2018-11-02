@@ -3,14 +3,32 @@
 void main()
 {
 	int file;
-	char buf[255] = "abc";
-	int kq;
-	file = Open("abc.txt",0);
-	if (file != -1){
+	char buf[255];
+	int kq = -1, pos = -1, count = -1;
+//	CreateFile("abcd.txt");
+	file = Open("abcd.txt",0);
+	if (file > -1){
 		PrintString("Successful");
-		kq = Write(buf,255,file);
+		kq = Write("12232343535\0",255,file);
+		pos = Seek(0, file);
+		if (pos >= 0)
+		{
+			count = Read(buf,255,file);
+			if (count == -1)
+			{	
+				PrintString("\nCannot read");
+			}
+			else
+				{
+				PrintString("\nCan read");
+				PrintString(buf);
+				}	
+		}
+		else {
+			PrintString("\nseek failed");
+		}
 	}
 	if (kq >= 0){
-		PrintString("Ghi file thanh cong");
+		PrintString("\nGhi file thanh cong");
 	}
 }	

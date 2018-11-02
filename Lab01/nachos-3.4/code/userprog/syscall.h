@@ -28,9 +28,10 @@
 #define SC_Read		6
 #define SC_Write	7
 #define SC_Close	8
+#define SC_Seek		12
 //Syscall cho cac thao tac co ban
 #define SC_PrintString		16
-
+#define SC_ReadString 		17
 #define SC_Fork		9
 #define SC_Yield	10
 
@@ -102,7 +103,7 @@ int CreateFile(char * name);
 OpenFileId Open(char *name, int type);
 
 /* Write "size" bytes from "buffer" to the open file. */
-void Write(char *buffer, int size, OpenFileId id);
+int Write(char *buffer, int size, OpenFileId id);
 
 /* Read "size" bytes from the open file into "buffer".  
  * Return the number of bytes actually read -- if the open file isn't
@@ -129,6 +130,10 @@ void Fork(void (*func)());
 * Print a string to console
 */
 void PrintString(char* str);
+void ReadString(char * str, int length);
+//Seek in file
+int Seek(int pos, int id);
+
 
 /* Yield the CPU to another runnable thread, whether in this address space 
  * or not. 

@@ -74,13 +74,13 @@ Join:
 	j	$31
 	.end Join
 
-	.globl Create
-	.ent	Create
+	.globl CreateFile
+	.ent	CreateFile
 CreateFile:
 	addiu $2,$0,SC_Create
 	syscall
 	j	$31
-	.end Create
+	.end CreateFile
 
 	.globl Open
 	.ent	Open
@@ -116,6 +116,31 @@ Close:
 
 	.globl Fork
 	.ent	Fork
+	
+	.globl PrintString
+	.ent PrintString
+PrintString:
+	addiu $2, $0, SC_PrintString
+	syscall
+	j	$31
+	.end PrintString
+
+	.globl ReadString
+	.ent	ReadString
+ReadString:
+	addiu $2,$0,SC_ReadString
+	syscall
+	j	$31
+	.end ReadString
+
+	.globl Seek
+	.ent	Seek
+Seek:
+	addiu $2,$0,SC_Seek
+	syscall
+	j	$31
+	.end Seek
+	
 Fork:
 	addiu $2,$0,SC_Fork
 	syscall

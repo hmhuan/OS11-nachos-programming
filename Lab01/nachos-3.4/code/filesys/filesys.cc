@@ -263,17 +263,20 @@ OpenFile* FileSystem::Open(char *name, int type)
 	directory->FetchFrom(directoryFile);
 	sector = directory->Find(name);
 	if (sector >= 0)
-		openf[freeSlot] = new OpenFile(sector, type);	// name was found in directory 
-	else { // neu file chua ton tai
-		if (type == 0) { // neu file duoc mo de ghi
-			Create(name,0);
-			sector = directory->Find(name);
-			openf[freeSlot] = new OpenFile(sector, type);
-		}
+	{
+		openFile = new OpenFile(sector, type);	// name was found in directory 
 	}
+	
+	/*else { // neu file chua ton tai
+		if (type == 0) { // neu file duoc mo de ghi
+			if (this->Create(name,0)){
+
+			sector = directory->Find(name);
+			openFile = new OpenFile(sector, type);
+		}
+	}*/
 	delete directory;
-	//index++;
-	return openf[freeSlot];				// return NULL if not found
+	return openFile;				// return NULL if not found
 }
 
 //Ham tim slot trong
