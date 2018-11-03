@@ -148,8 +148,8 @@ FileSystem::FileSystem(bool format)
 	{
 		openf[i] = NULL;
 	}
-	openf[index++] = this->Open("stdin");
-	openf[index++] = this->Open("stdout");
+	openf[index++] = this->Open("stdin", 2); // Quy uoc type = 2: console input
+	openf[index++] = this->Open("stdout", 3); // Quy uoc type = 3: console output
 	this->Create("stdin", 0);
 	this->Create("stdout", 0);
 }
@@ -267,14 +267,6 @@ OpenFile* FileSystem::Open(char *name, int type)
 		openFile = new OpenFile(sector, type);	// name was found in directory 
 	}
 	
-	else { // neu file chua ton tai
-		if (type == 0) { // neu file duoc mo de ghi
-			if (this->Create(name,0)){
-
-			sector = directory->Find(name);
-			openFile = new OpenFile(sector, type);
-		}
-	}
 	delete directory;
 	return openFile;				// return NULL if not found
 }

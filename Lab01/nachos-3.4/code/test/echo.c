@@ -1,8 +1,32 @@
 #include "syscall.h"
 
+#define MAX_LENGTH 255
+
 void main()
 {
-	char *s;
-	ReadString(s, 255);
-	PrintString(s);
+	int stdin;
+	int stdout;
+	char buffer[MAX_LENGTH];
+	int len; 
+
+	// Goi ham Open de mo stdin 
+	PrintString("Nhap: ");
+	stdin = Open("stdin", 2);
+	if (stdin != -1)
+	{
+		//Goi ham Read de doc noi dung nhap vao stdin
+		len = Read(buffer, MAX_LENGTH, stdin);
+		
+		if (len != -1 && len != -2) //Kiem tra loi (-1), hay EOF (-2)
+		{
+			stdout = Open("stdout", 3); // Goi ham Open voi type = 3 mo stdout
+			if (stdout != -1)
+			{
+				PrintString("Xuat: ");
+				Write(buffer, len, 1); // Goi ham Write de ghi noi dung doc duoc vao stdout
+				Close(stdout); // Goi ham Close de dong stdout
+			}
+		}
+		Close(stdin); // Goi ham Close de dong stdin
+	}
 }

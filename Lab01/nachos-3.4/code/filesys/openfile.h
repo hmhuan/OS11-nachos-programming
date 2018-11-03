@@ -84,12 +84,13 @@ class OpenFile {
     int type;
 	// type 0 : read and write
 	// type 1 : only read
-
+	// type 2, 3: console input, console output
+	
     OpenFile(int sector);		// Open a file whose header is located
 					// at "sector" on the disk
          OpenFile(int f, int t); // open the file with custom type
 
-    ~OpenFile();			// Close the file
+    ~OpenFile();		// Close the file
 
     void Seek(int position); 		// Set the position from which to 
 					// start reading/writing -- UNIX lseek

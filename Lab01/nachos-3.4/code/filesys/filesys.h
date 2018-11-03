@@ -43,30 +43,31 @@
 				// implementation is available
 class FileSystem {
   public:
+	// Danh sach tep tin
     OpenFile** openf;
+	// chi so
     int index;
+	// So luong tep tin co the mo
     int fileNum;
 
     FileSystem(bool format) {
-	fileNum = 10;
-	openf = new OpenFile*[fileNum];
-	index = 0;
-	for (int i = 0; i < fileNum; ++i)
-	{
-		openf[i] = NULL;
-	}
-	this->Create("stdin", 0);
-	this->Create("stdout", 0);
-	openf[index++] = this->Open("stdin", 2);
-	openf[index++] = this->Open("stdout", 3);  
+		fileNum = 10;
+		openf = new OpenFile*[fileNum];
+		index = 0;
+		for (int i = 0; i < fileNum; ++i)
+			openf[i] = NULL;
+		this->Create("stdin", 0);
+		this->Create("stdout", 0);
+		openf[index++] = this->Open("stdin", 2);
+		openf[index++] = this->Open("stdout", 3);  
     }
 
     bool Create(char *name, int initialSize) { 
-	int fileDescriptor = OpenForWrite(name);
+		int fileDescriptor = OpenForWrite(name);
 
-	if (fileDescriptor == -1) return FALSE;
-	Close(fileDescriptor); 
-	return TRUE; 
+		if (fileDescriptor == -1) return FALSE;
+		Close(fileDescriptor); 
+		return TRUE; 
 	}
 
     OpenFile* Open(char *name) {
@@ -81,7 +82,6 @@ class FileSystem {
 		int fileDescriptor = OpenForReadWrite(name, FALSE);
 
 		if (fileDescriptor == -1) return NULL;
-		//index++;
 		return new OpenFile(fileDescriptor, type);
 	}
 
@@ -124,14 +124,14 @@ class FileSystem {
     bool Remove(char *name);  		// Delete a file (UNIX unlink)
 
     //Ham tim slot trong
-        int FindFreeSlot();
+    int FindFreeSlot();
 
 
     void List();			// List all the files in the file system
 
     void Print();			// List all the files and their contents
 
-  private:
+private:
    OpenFile* freeMapFile;		// Bit map of free disk blocks,
 					// represented as a file
    OpenFile* directoryFile;		// "Root" directory -- list of 

@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort democreat openfile printstring
+all: halt shell matmult sort openfile printstring echo createfile cat copy write
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -66,11 +66,11 @@ matmult: matmult.o start.o
 	$(LD) $(LDFLAGS) start.o matmult.o -o matmult.coff
 	../bin/coff2noff matmult.coff matmult
 
-democreat.o: democreat.c
-	$(CC) $(CFLAGS) -c democreat.c
-democreat: democreat.o start.o
-	$(LD) $(LDFLAGS) start.o democreat.o -o democreat.coff
-	../bin/coff2noff democreat.coff democreat
+createfile.o: createfile.c
+	$(CC) $(CFLAGS) -c createfile.c
+createfile: createfile.o start.o
+	$(LD) $(LDFLAGS) start.o createfile.o -o createfile.coff
+	../bin/coff2noff createfile.coff createfile
 
 openfile.o: openfile.c
 	$(CC) $(CFLAGS) -c openfile.c
@@ -83,11 +83,13 @@ printstring.o: printstring.c
 printstring: printstring.o start.o
 	$(LD) $(LDFLAGS) start.o printstring.o -o printstring.coff
 	../bin/coff2noff printstring.coff printstring
+
 echo.o: echo.c
 	$(CC) $(CFLAGS) -c echo.c
 echo: echo.o start.o
 	$(LD) $(LDFLAGS) start.o echo.o -o echo.coff
 	../bin/coff2noff echo.coff echo	
+
 read.o: read.c
 	$(CC) $(CFLAGS) -c read.c
 read: read.o start.o
@@ -99,3 +101,9 @@ write.o: write.c
 write: write.o start.o
 	$(LD) $(LDFLAGS) start.o write.o -o write.coff
 	../bin/coff2noff write.coff write
+
+cat.o: cat.c
+	$(CC) $(CFLAGS) -c cat.c
+cat: cat.o start.o
+	$(LD) $(LDFLAGS) start.o cat.o -o cat.coff
+	../bin/coff2noff cat.coff cat
