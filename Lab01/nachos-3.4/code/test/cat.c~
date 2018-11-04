@@ -24,7 +24,7 @@ void main()
 		Seek(0, fileID);
 		stdout = Open("stdout", 3);
 		
-		Write("Noi dung file:\n\n",40, stdout);
+		Write("Noi dung file:\n",255, stdout);
 		for (i = 0; i < fileSize; i++) // Cho vong lap chay tu 0 - fileSize
 		{
 			Read(c,1, fileID); //Doc tung byte noi dung tep tin

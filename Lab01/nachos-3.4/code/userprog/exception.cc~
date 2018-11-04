@@ -169,7 +169,7 @@ void Open_handler(){
 				
 				machine->WriteRegister(2, freeSlot); //tra ve OpenFileID
 			}
-			else {
+			else if (type ==  1){
 				machine->WriteRegister(2, -1);
 				delete[] filename;
 				return;
@@ -381,7 +381,7 @@ void Seek_handler(){
 		return;
 	}
 	// Neu pos = -1 thi gan pos = Length
-	if (pos == -1)
+	if (pos <= -1)
 		pos = fileSystem->openf[id]->Length();
 	
 	if (pos > fileSystem->openf[id]->Length() || pos < 0) // Kiem tra lai vi tri pos co hop le khong

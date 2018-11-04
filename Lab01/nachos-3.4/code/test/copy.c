@@ -5,7 +5,7 @@
 void main()
 {
 	int srcID, destID; //ID file nguon, file dich
-	char src[MAX_LENGTH], dest[MAX_LENGTH]; //Ten file nguon, file dich
+	char src[MAX_LENGTH], dest[MAX_LENGTH], buf[MAX_LENGTH]; //Ten file nguon, file dich
 	int fileSize; //Kich thuoc file nguon
 	char c;
 	int i;
@@ -20,14 +20,14 @@ void main()
 	{
 		fileSize = Seek(-1, srcID);
 		Seek(0, srcID);
-		
+		CreateFile(dest);
 		destID = Open(dest, 0);
 		if (destID != -1)
 		{
 			for (i = 0; i < fileSize; i++) // Cho vong lap chay tu 0 - fileSize
 			{
-				Read(c, 1, srcID); //Doc tung byte noi dung file nguon
-				Write(c,1, destID); //ghi tung byte 1 ra file dich
+				Read(&c, 1, srcID); //Doc tung byte noi dung file nguon
+				Write(&c,1, destID); //ghi tung byte 1 ra file dich
 			}
 			Close(destID);
 		}

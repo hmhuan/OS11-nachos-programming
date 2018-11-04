@@ -27,8 +27,8 @@ void main()
 		Write("Noi dung file:\n",255, stdout);
 		for (i = 0; i < fileSize; i++) // Cho vong lap chay tu 0 - fileSize
 		{
-			Read(c,1, fileID); //Doc tung byte noi dung tep tin
-			Write(c,1,stdout);
+			Read(&c,1, fileID); //Doc tung byte noi dung tep tin
+			Write(&c,1,stdout);
 		}
 		Close(fileID); // Goi ham Close de dong file
 		Close(stdout);
