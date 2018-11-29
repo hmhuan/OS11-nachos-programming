@@ -141,6 +141,14 @@ Seek:
 	j	$31
 	.end Seek
 	
+	.globl PrintChar
+	.ent	PrintChar
+PrintChar:
+	addiu $2,$0,SC_PrintChar
+	syscall
+	j	$31
+	.end PrintChar
+
 Fork:
 	addiu $2,$0,SC_Fork
 	syscall

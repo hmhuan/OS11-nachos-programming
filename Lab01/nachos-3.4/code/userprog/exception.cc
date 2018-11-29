@@ -238,6 +238,14 @@ void ReadString_handler()
 	delete buffer;
 }
 
+void PrintChar_handler(){
+	// Input: Ki tu(char)
+	// Output: Ki tu(char)
+	// Cong dung: Xuat mot ki tu la tham so arg ra man hinh
+	char c = machine->ReadRegister(4); // Doc ki tu tu thanh ghi r4
+	gSynchConsole->Write(&c, 1); // In ky tu tu bien c, 1 byte
+}
+
 void Read_handler() {
 	// Input: buffer(char*), so ky tu(int), id cua file(OpenFileID)
 	// Output: -1: Loi, So byte read thuc su: Thanh cong, -2: Thanh cong
@@ -353,6 +361,7 @@ void Write_handler() {
 		}
 	}	
 }
+
 void Seek_handler(){
 	// Input: Vi tri(int), id cua file(OpenFileID)
 	// Output: -1: Loi, Vi tri thuc su: Thanh cong
@@ -396,6 +405,69 @@ void Seek_handler(){
 		machine->WriteRegister(2, pos);
 	}
 	return;
+}
+
+/*static void StartProcess(int arg)
+{
+    switch (arg)
+    {
+        case 0: // Fork
+            // Fork just restore registers.
+            RestoreUserState();
+            break;
+        case 1: // Exec
+            if (space != NULL)
+            {
+                // Exec should initialize registers and restore address space.
+                space->InitRegisters();
+              	space->RestoreState();
+            }
+            break;
+        default:
+            break;
+    }
+
+	machine->Run();
+}*/
+
+void Exec_handler()
+{
+	// Input: arg: Dia chi cua chuoi name
+	// Output: Tra ve SpaceID neu thanh cong, -1 neu loi
+	// Chuc nang: Tra ve SpaceID cua tien trinh.
+	 
+	int virtAddr = machine->ReadRegister(4); // Lay dia chi cua tham so name tu thanh ghi so 4
+	char* filename;
+	SpaceId pid;
+	
+	filename = User2System(virtAddr, MaxFileLength); // Copy chuoi tu vung nho User Space sang System Space voi bo dem name dai MaxFileLength
+	if (filename == NULL) 
+	{
+		printf("Unable to open file %s\n", filename);
+		machine->WriteRegister(2, -1);
+        return;
+    }
+	
+	OpenFile *executable = fileSystem->Open(filename);
+    AddrSpace *space;
+	Thread *mythread;
+    if (executable == NULL) {
+		printf("Unable to open file %s\n", filename);
+		machine->WriteRegister(2, -1);		
+		return;
+    }
+    space = new AddrSpace(executable); 
+	mythread = new Thread(filename);  
+    mythread->space = space;
+
+    delete executable;			// close file
+
+    space->InitRegisters();		// set the initial register values
+    space->RestoreState();		// load page table register
+
+    machine->Run();			// jump to the user progam
+    ASSERT(FALSE);			// machine->Run never returns;
+	//mythread->Fork(StartProcess, 1);
 }
 
 
@@ -455,7 +527,7 @@ void ExceptionHandler(ExceptionType which)
 			interrupt->Halt();
 			break;
 		case SC_Exec:
-			printf("\n\nSC_Exec Exception");
+			Exec_handler();
 			interrupt->Halt();
 			break;
 		case SC_Join:
@@ -476,6 +548,9 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		case SC_ReadString:
 			ReadString_handler();
+			break;
+		case SC_PrintChar:
+			PrintChar_handler();
 			break;
 		case SC_Read:
 			Read_handler();

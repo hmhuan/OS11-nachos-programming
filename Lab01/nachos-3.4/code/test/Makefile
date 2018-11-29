@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort openfile printstring echo createfile cat copy write
+all: halt shell matmult sort openfile printstring echo createfile cat copy write ping pong exec
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -113,3 +113,21 @@ copy.o: copy.c
 copy: copy.o start.o
 	$(LD) $(LDFLAGS) start.o copy.o -o copy.coff
 	../bin/coff2noff copy.coff copy
+
+ping.o: ping.c
+	$(CC) $(CFLAGS) -c ping.c
+ping: ping.o start.o
+	$(LD) $(LDFLAGS) start.o ping.o -o ping.coff
+	../bin/coff2noff ping.coff ping
+
+pong.o: pong.c
+	$(CC) $(CFLAGS) -c pong.c
+pong: pong.o start.o
+	$(LD) $(LDFLAGS) start.o pong.o -o pong.coff
+	../bin/coff2noff pong.coff pong
+
+exec.o: exec.c
+	$(CC) $(CFLAGS) -c exec.c
+exec: exec.o start.o
+	$(LD) $(LDFLAGS) start.o exec.o -o exec.coff
+	../bin/coff2noff exec.coff exec

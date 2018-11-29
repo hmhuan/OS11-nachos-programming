@@ -30,8 +30,9 @@
 #define SC_Close	8
 #define SC_Seek		12
 //Syscall cho cac thao tac co ban
-#define SC_PrintString		16
-#define SC_ReadString 		17
+#define SC_PrintChar	13
+#define SC_PrintString	16
+#define SC_ReadString 	17
 #define SC_Fork		9
 #define SC_Yield	10
 
@@ -133,6 +134,8 @@ void PrintString(char* str);
 //Read a string to console
 void ReadString(char * str, int length);
 
+//Print a char to console
+void PrintChar(char c);
 
 /* Yield the CPU to another runnable thread, whether in this address space 
  * or not. 

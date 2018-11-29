@@ -128,7 +128,7 @@ ReadString:
 	addiu $2,$0,SC_ReadString
 	syscall
 	j	$31
-	.end PrintString
+	.end ReadString
 
 	.globl Seek
 	.ent	Seek
