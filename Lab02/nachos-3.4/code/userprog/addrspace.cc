@@ -159,8 +159,6 @@ AddrSpace::AddrSpace(char* filename)
     	SwapHeader(&noffH);
     ASSERT(noffH.noffMagic == NOFFMAGIC);
   
-// 	addrLock->P();
-
 	// how big is address space?
     size = noffH.code.size + noffH.initData.size + noffH.uninitData.size 
 			+ UserStackSize;	// we need to increase the size
@@ -172,14 +170,13 @@ AddrSpace::AddrSpace(char* filename)
 
     int numclear = gPhysPageBitMap->NumClear();
 
-    printf("\n\nSize: %d | numPages: %d | PageSize: %d | Numclear: %d\n\n", size, numPages, PageSize, numclear);  
+    //printf("\n\nSize: %d | numPages: %d | PageSize: %d | Numclear: %d\n\n", size, numPages, PageSize, numclear);  
 
     if(numPages > numclear)
     {
 	    printf("\nAddrSpace::Load : not enough memory for new process");
 	    numPages = 0;
 	    delete executable;
-//	    addrLock->V();
     }
 
     DEBUG('a', "Initializing address space, num pages %d, size %d\n", 
@@ -197,10 +194,8 @@ AddrSpace::AddrSpace(char* filename)
 	    pageTable[i].readOnly = FALSE;  // if the code segment was entirely on 
 					    // a separate page, we could set its 
 					    // pages to be read-only
-        printf("Physic Pages %d \n", pageTable[i].physicalPage);
+        //printf("Physic Pages %d \n", pageTable[i].physicalPage);
     }
-
-  //  addrLock->V();
 
     // then, copy in the code and data segments into memory
     if (noffH.code.size > 0)

@@ -407,164 +407,62 @@ void Seek_handler(){
 	return;
 }
 
-/*static void StartProcess(int arg)
-{
-    switch (arg)
-    {
-        case 0: // Fork
-            // Fork just restore registers.
-            //RestoreUserState();
-            break;
-        case 1: // Exec
-            if (space != NULL)
-            {
-                // Exec should initialize registers and restore address space.
-                space->InitRegisters();
-              	space->RestoreState();
-            }
-            break;
-        default:
-            break;
-    }
-
-	machine->Run();
-}*/
-
-/*void Exec_handler()
-{
-// We are in the kernel space, we have to copy the name of the file 
-        // by translating using ReadMem
-        char filename[100];
-        int i=0;
-
-        int vaddr = machine->ReadRegister(4);
-		int memval;
-        machine->ReadMem(vaddr, 1, &memval);
-        while ((*(char*)&memval) != '\0') {
-            filename[i]  = (char)memval;
-            ++i;
-            vaddr++;
-            machine->ReadMem(vaddr, 1, &memval);
-        }
-        filename[i]  = (char)memval;
-
-        // The above is a direct copy of StartProcess, I didn't want to change
-        // its scope so it has been included here
-        OpenFile *executable = fileSystem->Open(filename);
-        AddrSpace *space;
-
-        if (executable == NULL) {
-            printf("Unable to open file %s\n", filename);
-            return;
-        }
-        space = new AddrSpace(executable);    
-        currentThread->space = space;
-
-        delete executable;			// close file
-
-        space->InitRegisters();		// set the initial register values
-        space->RestoreState();		// load page table register
-
-        machine->Run();			// jump to the user progam
-        ASSERT(FALSE);			// machine->Run never returns;
-        // the address space exits
-        // by doing the syscall "exit"
-}*/
-/*void Exec_handler()
-{
-	// Input: arg: Dia chi cua chuoi name
-	// Output: Tra ve SpaceID neu thanh cong, -1 neu loi
-	// Chuc nang: Tra ve SpaceID cua tien trinh.
-	int virtAddr = machine->ReadRegister(4); // Lay dia chi cua tham so name tu thanh ghi so 4
-	char* filename;
-	SpaceId pid;
-
-	filename = User2System(virtAddr, MaxFileLength); // Copy chuoi tu vung nho User Space sang System Space voi bo dem name dai MaxFileLength
-	if (filename == NULL) 
-	{
-		printf("Unable to open file %s\n", filename);
-		machine->WriteRegister(2, -1);
-        return;
-    }
-	
-	OpenFile *executable = fileSystem->Open(filename);
-    	AddrSpace *space;
-	Thread *mythread;
-
-    if (executable == NULL) {
-		printf("Unable to open file %s\n", filename);
-		machine->WriteRegister(2, -1);		
-		return;
-    }
-    space = new AddrSpace(executable); 
-	mythread = new Thread(filename);  
-    mythread->space = space;
-
-    delete executable;			// close file
-
-    space->InitRegisters();		// set the initial register values
-    space->RestoreState();		// load page table register
-
-    machine->Run();			// jump to the user progam
-    ASSERT(FALSE);			// machine->Run never returns;
-  //  mythread->Fork(StartProcess, 1);
-}*/
 void Exec_handler() {
 	int virtAddr;
 	virtAddr = machine->ReadRegister(4);	// doc dia chi ten chuong trinh tu thanh ghi r4
 	char* name;
 	name = User2System(virtAddr, MaxFileLength + 1); // Lay ten chuong trinh, nap vao kernel
-	bmsem->P();
+	//Kiem tra ten chuong trinh
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System");
 		printf("\n Not enough memory in System");
-		bmsem->V();
 		machine->WriteRegister(2, -1);
 		return;
 	}
-	
+	//Kiem tra ten co giong voi ten chuong trinh chinh khong
 	if(strcmp(name,currentThread->getName()) == 0 )
 	{
 		printf("\nCan't not execute itself.\n");
-		bmsem->V();
 		machine->WriteRegister(2, -1);
 		return;
 	}
-	
+	//Kiem tra file thuc thi (exec) co ton tai khong
 	OpenFile *file = fileSystem->Open(name);
 	if (file == NULL)
 	{
 		printf("\nExec:: Can't open this file.");
-		bmsem->V();
 		machine->WriteRegister(2,-1);
 		return;
 	}
-
 	delete file;
-
 	// Tìm slot trống trong bảng processTable.
 	int index = processTable->Find();
 
-    // Check if have free slot
+    //Kiem tra co tim duocj free slot khong
 	if(index < 0)
 	{
 		printf("\nThere is no free slot.\n");
-		bmsem->V();
 		machine->WriteRegister(2, -1);
 		return;
 	}
 
-	
+	//Tao doi tuong Process va set ten cho doi tuong
 	processList[index] = new Process(index);
 	processList[index]->SetFileName(name);
 
-	// parrentID là processID của currentThread
+	//parrentID là processID của currentThread
   	processList[index]->parentID = currentThread->processID;
 
 	// Gọi thực thi phương thức Exec của lớp Process.
 	int processID = processList[index]->Exec(name,index);
-	bmsem->V();
+
+	if(currentThread->processID != processList[processID]->parentID)
+	{
+		printf("\nCan't join in process which is not it's parent process.\n");
+		machine->WriteRegister(2, -1);
+		return;
+	}
 
 	if (processID > -1) {
 		machine->WriteRegister(2, processID);
@@ -573,26 +471,20 @@ void Exec_handler() {
 		machine->WriteRegister(2, -1);
 	}
 	
-// plus begin
-	/*if(currentThread->processID != processList[processID]->parentID)
-	{
-		printf("\nCan't join in process which is not it's parent process.\n");
-		return;
-	}*/
+	
 
     // Tăng numwait và gọi JoinWait() để chờ tiến trình con thực hiện.
 	// Sau khi tiến trình con thực hiện xong, tiến trình đã được giải phóng
-	processList[processList[processID]->parentID]->IncNumWait();
-	processList[processID]->IncNumWait();
+	//processList[processList[processID]->parentID]->IncNumWait();
+	//processList[processID]->IncNumWait();
 	
-	processList[processList[processID]->parentID]->JoinWait();
+	//processList[processList[processID]->parentID]->JoinWait();
 	
 	
 	// Xử lý exitcode.	
-	int ec = processList[processID]->GetExitCode();
+	//int ec = processList[processID]->GetExitCode();
     // ExitRelease() để cho phép tiến trình con thoát.
-	processList[processID]->ExitRelease();
-// plus end
+	//processList[processID]->ExitRelease();
 
 }
 

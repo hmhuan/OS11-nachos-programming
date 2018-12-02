@@ -5,6 +5,9 @@ void main()
 	PrintString("\nChuong trinh bat dau ...\n");
 	pingPID = Exec("./test/ping");
 	pongPID = Exec("./test/pong");
+ 	Exec("./test/pong");
+	Exec("./test/pong");
+	i = 0;
 	while(1)
 	{
 		
