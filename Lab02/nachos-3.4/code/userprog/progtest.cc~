@@ -59,7 +59,7 @@ StartProcess(char *filename)
 void startProcess(int processID) {
 	char* fileName = processList[processID]->GetFileName();
 
-    AddrSpace *space, *oldSpace;
+    AddrSpace *space;
     space = new AddrSpace(fileName);
 
 	if(space == NULL)
@@ -67,14 +67,12 @@ void startProcess(int processID) {
 		printf("\Process::Exec : Can't create AddSpace.");
 		return;
 	}
-	oldSpace = currentThread->space;
     currentThread->space = space;
 	
     space->InitRegisters();		
     space->RestoreState();		
 
     machine->Run();		
-	currentThread->space = oldSpace;
     ASSERT(FALSE);
 }
 

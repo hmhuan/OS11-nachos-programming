@@ -23,7 +23,7 @@ public:
 	int Exec(char*,int);        
     int GetID();                // Trả về ProcessID của tiến trình gọi thực hiện
     int GetNumWait();           // Trả về số lượng tiến trình chờ          
-    void ExitWait();             // 4. Tiến trình con kết thúc
+    void ExitWait();             //Tiến trình con kết thúc
 
     void SetExitCode(int);      // Đặt exitcode của tiến trình
     int GetExitCode();          // Trả về exitcode

@@ -421,7 +421,7 @@ void Exec_handler() {
 		return;
 	}
 	//Kiem tra ten co giong voi ten chuong trinh chinh khong
-	if(strcmp(name,currentThread->getName()) == 0 )
+	if(strcmp(name,"./test/scheduler") == 0 )
 	{
 		printf("\nCan't not execute itself.\n");
 		machine->WriteRegister(2, -1);
@@ -439,7 +439,7 @@ void Exec_handler() {
 	// Tìm slot trống trong bảng processTable.
 	int index = processTable->Find();
 
-    //Kiem tra co tim duocj free slot khong
+    //Kiem tra co tim duoc free slot khong
 	if(index < 0)
 	{
 		printf("\nThere is no free slot.\n");
