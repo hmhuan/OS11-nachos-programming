@@ -38,9 +38,9 @@ extern Timer *timer;				// the hardware alarm clock
 #include "stable.h"
 
 extern Machine* machine;	// user program memory and registers
-extern SynchConsole* gSynchConsole;
-extern PTable* pTab;
-extern BitMap* gPhysPageBitMap;
+extern SynchConsole* gSynchConsole; // Quan ly nhap xuat console
+extern PTable* pTab; 	
+extern BitMap* gPhysPageBitMap; // Quan ly cac frame
 extern Semaphore* addrLock;
 extern STable* semTab; 
 #endif

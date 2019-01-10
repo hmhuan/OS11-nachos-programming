@@ -6,18 +6,18 @@
 
 PCB::PCB(int id)
 {
-	joinsem= new Semaphore("JoinSem",0);
-	exitsem= new Semaphore("ExitSem",0);
-	mutex= new Semaphore("Mutex",1);
-	pid= id;
-	exitcode= 0;
-	numwait= 0;
+	joinsem = new Semaphore("JoinSem",0);
+	exitsem = new Semaphore("ExitSem",0);
+	mutex = new Semaphore("Mutex",1);
+	pid = id;
+	exitcode = 0;
+	numwait = 0;
 	if(id)
-		parentID= currentThread->processID;
+		parentID = currentThread->processID;
 	else
-		parentID= 0;
-	thread= NULL;
-	JoinStatus= -1;
+		parentID = -1; // 0
+	thread = NULL;
+	JoinStatus = -1;
 
 }
 
@@ -54,13 +54,17 @@ void PCB::SetExitCode(int ec)
 
 void PCB::IncNumWait()
 {
-	numwait++;
+	mutex->P();
+	++numwait;
+	mutex->V();
 }
 
 void PCB::DecNumWait()
 {
+	mutex->P();
 	if(numwait)
-		numwait--;
+		--numwait;
+	mutex->V();
 }
 
 char* PCB::GetNameThread()
@@ -68,18 +72,17 @@ char* PCB::GetNameThread()
 	return thread->getName();
 }
 
+void PCB::SetNameThread(char* Tn) { strcpy(ThreadName,Tn);}
+
 //-------------------------------------------------------------------
 void PCB::JoinWait()
 {
 	JoinStatus = parentID;
-	// Tăng numwait
-	IncNumWait();
 	joinsem->P();
 }
 
 void PCB::JoinRelease()
 {
-	DecNumWait();
 	joinsem->V();
 }
 
@@ -98,16 +101,17 @@ void PCB::ExitRelease()
 //------------------------------------------------------------------
 int PCB::Exec(char *filename, int pid)
 {
-	mutex->P();
-	thread = new Thread(filename);
-	if(thread == NULL)
+	mutex->P(); // Giup tranh tinh trang nap 2 tien trinh cung luc
+	this->thread = new Thread(filename);
+	if(this->thread == NULL)
 	{
 		printf("\nLoi: Khong tao duoc tien trinh moi !!!\n");
 		mutex->V();
 		return -1;
 	}
-	thread->processID= pid;
-	thread->Fork(StartProcess_2,pid);
+	this->thread->processID = pid;
+	this->parentID = currentThread->processID;
+	this->thread->Fork(StartProcess_2,pid);
 	mutex->V();
 	return pid;
 }

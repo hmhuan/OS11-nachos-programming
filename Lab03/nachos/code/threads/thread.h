@@ -130,7 +130,7 @@ class Thread {
 
     AddrSpace *space;			// User code this thread is running.
     int processID;
-int exitStatus;
+	int exitStatus;
 #endif
 };
 

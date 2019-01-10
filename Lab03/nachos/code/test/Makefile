@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort openfile printstring echo createfile cat copy write ping pong scheduler
+all: halt shell matmult sort openfile printstring echo createfile cat copy write ping pong scheduler Nhap_Bot Nhap_Nguyen_Lieu Nhap_Gia_Vi Lam_Banh San_Xuat_Banh
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -131,3 +131,32 @@ scheduler.o: scheduler.c
 scheduler: scheduler.o start.o
 	$(LD) $(LDFLAGS) start.o scheduler.o -o scheduler.coff
 	../bin/coff2noff scheduler.coff scheduler
+Nhap_Bot.o: Nhap_Bot.c
+	$(CC) $(CFLAGS) -c Nhap_Bot.c
+Nhap_Bot: Nhap_Bot.o start.o
+	$(LD) $(LDFLAGS) start.o Nhap_Bot.o -o Nhap_Bot.coff
+	../bin/coff2noff Nhap_Bot.coff Nhap_Bot
+
+Nhap_Nguyen_Lieu.o: Nhap_Nguyen_Lieu.c
+	$(CC) $(CFLAGS) -c Nhap_Nguyen_Lieu.c
+Nhap_Nguyen_Lieu: Nhap_Nguyen_Lieu.o start.o
+	$(LD) $(LDFLAGS) start.o Nhap_Nguyen_Lieu.o -o Nhap_Nguyen_Lieu.coff
+	../bin/coff2noff Nhap_Nguyen_Lieu.coff Nhap_Nguyen_Lieu
+
+Nhap_Gia_Vi.o: Nhap_Gia_Vi.c
+	$(CC) $(CFLAGS) -c Nhap_Gia_Vi.c
+Nhap_Gia_Vi: Nhap_Gia_Vi.o start.o
+	$(LD) $(LDFLAGS) start.o Nhap_Gia_Vi.o -o Nhap_Gia_Vi.coff
+	../bin/coff2noff Nhap_Gia_Vi.coff Nhap_Gia_Vi
+
+Lam_Banh.o: Lam_Banh.c
+	$(CC) $(CFLAGS) -c Lam_Banh.c
+Lam_Banh: Lam_Banh.o start.o
+	$(LD) $(LDFLAGS) start.o Lam_Banh.o -o Lam_Banh.coff
+	../bin/coff2noff Lam_Banh.coff Lam_Banh
+
+San_Xuat_Banh.o: San_Xuat_Banh.c
+	$(CC) $(CFLAGS) -c San_Xuat_Banh.c
+San_Xuat_Banh: San_Xuat_Banh.o start.o
+	$(LD) $(LDFLAGS) start.o San_Xuat_Banh.o -o San_Xuat_Banh.coff
+	../bin/coff2noff San_Xuat_Banh.coff San_Xuat_Banh

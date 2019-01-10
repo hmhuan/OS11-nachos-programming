@@ -246,6 +246,12 @@ void PrintChar_handler(){
 	gSynchConsole->Write(&c, 1); // In ky tu tu bien c, 1 byte
 }
 
+void PrintInt_Handler()
+{
+	int c = machine->ReadRegister(4); // Doc ki tu tu thanh ghi r4
+	printf("%d\n", c);
+}
+
 void Read_handler() {
 	// Input: buffer(char*), so ky tu(int), id cua file(OpenFileID)
 	// Output: -1: Loi, So byte read thuc su: Thanh cong, -2: Thanh cong
@@ -433,7 +439,6 @@ void Exec_handler() {
 	delete file;
 	// Gọi hàm ExecUpdate của lớp PTable
 	int result = pTab->ExecUpdate(name);
-	printf("\nres = %d", result);
 	machine->WriteRegister(2, result);
 }
 
@@ -443,7 +448,7 @@ void Join_Handler()
 	int id = machine->ReadRegister(4);
 	// Gọi thực hiện pTab->JoinUpdate(id) và lưu kết quả thực hiện của hàm vào thanh ghi r2. 
 	int result = pTab->JoinUpdate(id);
-	printf("\nres = %d", result);
+
 	machine->WriteRegister(2, result);
 }
 
@@ -615,6 +620,9 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		case SC_StringCmp:
 			StringCmp_Handler();
+			break;
+		case SC_PrintInt:
+			PrintInt_Handler();
 			break;
 		default:
 			printf("\nUnexpected user mode exception (%d %d)", which, type);

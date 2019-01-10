@@ -40,6 +40,7 @@
 #define SC_Down	15
 #define SC_StringLen	18
 #define SC_StringCmp	19
+#define SC_PrintInt	20
 
 #ifndef IN_ASM
 
@@ -142,6 +143,7 @@ void ReadString(char * str, int length);
 //Print a char to console
 void PrintChar(char c);
 
+void PrintInt(int c);
 /* Yield the CPU to another runnable thread, whether in this address space 
  * or not. 
  */
